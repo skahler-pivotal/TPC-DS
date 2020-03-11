@@ -28,7 +28,7 @@ for i in $(ls $PWD/*.tpcds.*.sql); do
 		table_name=`echo $i | awk -F '.' '{print $3}'`
 		myfilename=$(basename $i)
 		mylogfile=$PWD/../log/$myfilename.single.explain_analyze.log
-		mytimingfile=$PWD/../log/$myfilename.timing
+		mytimingfile=$PWD/../log/timing.log
 		start_log
 		if [ "$EXPLAIN_ANALYZE" == "false" ]; then
 			start_time="`date "+%Y-%m-%d %H:%M:%S"`"
