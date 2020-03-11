@@ -26,16 +26,25 @@ for i in $(ls $PWD/*.tpcds.*.sql); do
 		id=`echo $i | awk -F '.' '{print $1}'`
 		schema_name=`echo $i | awk -F '.' '{print $2}'`
 		table_name=`echo $i | awk -F '.' '{print $3}'`
+		myfilename=$(basename $i)
+		mylogfile=$PWD/../log/$myfilename.single.explain_analyze.log
+		mytimingfile=$PWD/../log/$myfilename.single.explain_analyze.timing
 		start_log
 		if [ "$EXPLAIN_ANALYZE" == "false" ]; then
+			start_time="`date "+%Y-%m-%d %H:%M:%S"`"
+			echo "start time: $start_time" > $mytimingfile
 			echo "psql -v ON_ERROR_STOP=1 -A -q -t -P pager=off -v EXPLAIN_ANALYZE=\"\" -f $i | wc -l"
 			tuples=$(psql -v ON_ERROR_STOP=1 -A -q -t -P pager=off -v EXPLAIN_ANALYZE="" -f $i | wc -l; exit ${PIPESTATUS[0]})
+			end_time="`date "+%Y-%m-%d %H:%M:%S"`"
+			echo "end time: $end_time" >> $mytimingfile
 		else
-			myfilename=$(basename $i)
-			mylogfile=$PWD/../log/$myfilename.single.explain_analyze.log
+			start_time="`date "+%Y-%m-%d %H:%M:%S"`"
+			echo "start time: $start_time" > $mytimingfile
 			echo "psql -v ON_ERROR_STOP=1 -A -q -t -P pager=off -v EXPLAIN_ANALYZE=\"EXPLAIN ANALYZE\" -f $i > $mylogfile"
 			psql -v ON_ERROR_STOP=1 -A -q -t -P pager=off -v EXPLAIN_ANALYZE="EXPLAIN ANALYZE" -f $i > $mylogfile
 			tuples="0"
+			end_time="`date "+%Y-%m-%d %H:%M:%S"`"
+			echo "end time: $end_time" >> $mytimingfile
 		fi
 		log $tuples
 	done
