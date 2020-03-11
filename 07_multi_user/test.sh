@@ -79,17 +79,24 @@ for i in $(ls $sql_dir/*.sql); do
 	id=$i
 	schema_name=$session_id
 	table_name=$(basename $i | awk -F '.' '{print $3}')
+	mytimingfile=$PWD/../log/"$session_id"".""$myfilename"".timing"
 
 	if [ "$EXPLAIN_ANALYZE" == "false" ]; then
+                start_time="`date "+%Y-%m-%d %H:%M:%S"`"
 		echo "psql -v ON_ERROR_STOP=1 -A -q -t -P pager=off -v EXPLAIN_ANALYZE="" -f $i | wc -l"
 		tuples=$(psql -v ON_ERROR_STOP=1 -A -q -t -P pager=off -v EXPLAIN_ANALYZE="" -f $i | wc -l; exit ${PIPESTATUS[0]})
 		tuples=$(($tuples-1))
+                end_time="`date "+%Y-%m-%d %H:%M:%S"`"
+                echo "$session_id$i|$GEN_DATA_SCALE|$start_time|$end_time" >> $mytimingfile
 	else
+                start_time="`date "+%Y-%m-%d %H:%M:%S"`"
 		myfilename=$(basename $i)
 		mylogfile=$PWD/../log/"$session_id"".""$myfilename"".multi.explain_analyze.log"
 		echo "psql -v ON_ERROR_STOP=1 -A -q -t -P pager=off -v EXPLAIN_ANALYZE=\"EXPLAIN ANALYZE\" -f $i"
 		psql -v ON_ERROR_STOP=1 -A -q -t -P pager=off -v EXPLAIN_ANALYZE="EXPLAIN ANALYZE" -f $i > $mylogfile
 		tuples="0"
+                end_time="`date "+%Y-%m-%d %H:%M:%S"`"
+                echo "$session_id$i|$GEN_DATA_SCALE|$start_time|$end_time" >> $mytimingfile
 	fi
 		
 	#remove the extra line that \timing adds
