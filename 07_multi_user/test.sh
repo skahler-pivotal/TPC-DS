@@ -79,7 +79,7 @@ for i in $(ls $sql_dir/*.sql); do
 	id=$i
 	schema_name=$session_id
 	table_name=$(basename $i | awk -F '.' '{print $3}')
-	mytimingfile="$PWD/../log/${session_id}.${myfilename}_timing.log"
+	mytimingfile="$PWD/../log/${session_id}_session_timing.log"
 
 	if [ "$EXPLAIN_ANALYZE" == "false" ]; then
                 start_time="`date "+%Y-%m-%d %H:%M:%S"`"
